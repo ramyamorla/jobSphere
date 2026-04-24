@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import JobForm from "../components/JobForm";
 import JobList from "../components/JobList";
 import { emptyCreateJobRequest } from "../dto/jobDto";
-import { createJob, fetchJobs } from "../service/jobService";
+import { createJob, fetchJobs, removeJob } from "../service/jobService";
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState([]);
   const [formData, setFormData] = useState(emptyCreateJobRequest);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -50,6 +51,21 @@ export default function JobsPage() {
     }
   }
 
+  async function handleDelete(jobId) {
+    setError("");
+    setMessage("");
+    setDeletingId(jobId);
+    try {
+      await removeJob(jobId);
+      setMessage("Job deleted successfully.");
+      await loadJobs();
+    } catch (err) {
+      setError("Job deletion failed. Try again.");
+    } finally {
+      setDeletingId("");
+    }
+  }
+
   return (
     <main className="container">
       <h1>jobSphere - Jobs Module</h1>
@@ -63,7 +79,12 @@ export default function JobsPage() {
           onSubmit={handleSubmit}
           loading={loading}
         />
-        <JobList jobs={jobs} loading={loading} />
+        <JobList
+          jobs={jobs}
+          loading={loading}
+          onDelete={handleDelete}
+          deletingId={deletingId}
+        />
       </div>
     </main>
   );

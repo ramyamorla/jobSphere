@@ -24,4 +24,14 @@ public class JobDaoImpl implements JobDao {
     public List<Job> findAllOrderByCreatedAtDesc() {
         return jobRepository.findAllByOrderByCreatedAtDesc();
     }
+
+    @Override
+    public boolean existsById(String jobId) {
+        return jobRepository.existsById(jobId);
+    }
+
+    @Override
+    public void deleteById(String jobId) {
+        jobRepository.deleteById(jobId);
+    }
 }

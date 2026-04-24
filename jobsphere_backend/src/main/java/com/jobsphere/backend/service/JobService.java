@@ -8,4 +8,6 @@ public interface JobService {
     JobResponse createJob(CreateJobRequest request);
 
     List<JobResponse> getAllJobs();
+
+    void deleteJobById(String jobId);
 }

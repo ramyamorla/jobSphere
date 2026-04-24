@@ -7,4 +7,8 @@ public interface JobDao {
     Job save(Job job);
 
     List<Job> findAllOrderByCreatedAtDesc();
+
+    boolean existsById(String jobId);
+
+    void deleteById(String jobId);
 }

@@ -7,7 +7,9 @@ import com.jobsphere.backend.model.Job;
 import com.jobsphere.backend.service.JobService;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -37,6 +39,14 @@ public class JobServiceImpl implements JobService {
         return jobDao.findAllOrderByCreatedAtDesc().stream()
             .map(this::toResponse)
             .toList();
+    }
+
+    @Override
+    public void deleteJobById(String jobId) {
+        if (!jobDao.existsById(jobId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found");
+        }
+        jobDao.deleteById(jobId);
     }
 
     private JobResponse toResponse(Job job) {
