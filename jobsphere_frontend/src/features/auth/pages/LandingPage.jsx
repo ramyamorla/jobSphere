@@ -6,43 +6,78 @@ import { checkUsername, signIn } from "../service/authService";
 export default function LandingPage({ onAuthSuccess }) {
   const [formData, setFormData] = useState(authEntryInitialState);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [statusTone, setStatusTone] = useState(null);
   const [hideLogo, setHideLogo] = useState(false);
 
   function handleChange(event) {
+    setStatusTone(null);
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleCheckUsername() {
     setLoading(true);
-    setError("");
-    setMessage("");
+    setStatusTone(null);
     try {
       const response = await checkUsername(formData);
-      if (response.exists) {
-        setMessage("Username already exists for selected role. You can sign in.");
-      } else {
-        setMessage("Username not found for this role. Sign in to create a new account.");
-      }
-    } catch (err) {
-      setError("Unable to check username. Ensure backend is running.");
+      setStatusTone(response.exists ? "registered" : "available");
+    } catch {
+      setStatusTone("fault");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSignIn(event) {
-    event.preventDefault();
+  async function handleQuickSignIn() {
+    if (!formData.username.trim()) {
+      setStatusTone("fault");
+      return;
+    }
     setLoading(true);
-    setError("");
-    setMessage("");
+    setStatusTone(null);
+    try {
+      const { exists } = await checkUsername({
+        username: formData.username,
+        role: formData.role
+      });
+      if (!exists) {
+        setStatusTone("fault");
+        return;
+      }
+      const response = await signIn({
+        username: formData.username,
+        role: formData.role
+      });
+      onAuthSuccess(response);
+    } catch {
+      setStatusTone("fault");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCreateAccount(event) {
+    event.preventDefault();
+    const { fullName, email, username, role, companyName, collegeName } = formData;
+    if (!username.trim() || !fullName.trim() || !email.trim()) {
+      setStatusTone("fault");
+      return;
+    }
+    if (role === "RECRUITER" && !companyName.trim()) {
+      setStatusTone("fault");
+      return;
+    }
+    if (role === "STUDENT" && !collegeName.trim()) {
+      setStatusTone("fault");
+      return;
+    }
+    setLoading(true);
+    setStatusTone(null);
     try {
       const response = await signIn(formData);
       onAuthSuccess(response);
-    } catch (err) {
-      setError("Sign in failed. Verify username/role and backend connectivity.");
+    } catch {
+      setStatusTone("fault");
     } finally {
       setLoading(false);
     }
@@ -55,7 +90,7 @@ export default function LandingPage({ onAuthSuccess }) {
         {!hideLogo && (
           <img
             src="/assets/jobsphere_logo.png"
-            alt="jobSphere logo"
+            alt="jobSphere"
             className="landing-big-logo"
             onError={() => setHideLogo(true)}
           />
@@ -65,14 +100,15 @@ export default function LandingPage({ onAuthSuccess }) {
         <p className="brand-tagline">Connect students with the right opportunities and empower recruiters.</p>
       </section>
       <section className="entry-panel">
-        {message && <p className="success">{message}</p>}
-        {error && <p className="error">{error}</p>}
         <AuthEntryCard
           formData={formData}
           onChange={handleChange}
           onCheckUsername={handleCheckUsername}
-          onSignIn={handleSignIn}
+          onQuickSignIn={handleQuickSignIn}
+          onCreateAccount={handleCreateAccount}
           loading={loading}
+          statusTone={statusTone}
+          onClearStatus={() => setStatusTone(null)}
         />
       </section>
     </main>

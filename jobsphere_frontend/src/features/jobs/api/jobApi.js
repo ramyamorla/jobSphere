@@ -15,8 +15,17 @@ export async function createJobApi(payload) {
   return response.json();
 }
 
-export async function getJobsApi() {
-  const response = await fetch(`${API_BASE_URL}/jobs`);
+export async function getJobsApi(filters = {}) {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && `${value}`.trim() !== "") {
+      params.append(key, value);
+    }
+  });
+
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE_URL}/jobs?${queryString}` : `${API_BASE_URL}/jobs`;
+  const response = await fetch(url);
 
   if (!response.ok) {
     const errorBody = await response.text();

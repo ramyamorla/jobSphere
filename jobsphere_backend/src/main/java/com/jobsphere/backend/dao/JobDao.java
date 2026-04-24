@@ -8,6 +8,8 @@ public interface JobDao {
 
     List<Job> findAllOrderByCreatedAtDesc();
 
+    List<Job> search(String keyword, String location, String jobType, String workMode, Integer minSalary);
+
     boolean existsById(String jobId);
 
     void deleteById(String jobId);

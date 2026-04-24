@@ -49,14 +49,17 @@ public class AuthServiceImpl implements AuthService {
 
         return userAccountDao.findByUsernameAndRole(normalizedUsername, role)
             .map(existingUser -> toSignInResponse(existingUser, false))
-            .orElseGet(() -> createNewUser(normalizedUsername, role));
+            .orElseGet(() -> createNewUser(normalizedUsername, role, request));
     }
 
-    private SignInResponse createNewUser(String username, UserRole role) {
+    private SignInResponse createNewUser(String username, UserRole role, SignInRequest request) {
         Instant now = Instant.now();
+        String displayName = resolveDisplayName(request.getFullName(), username);
 
         UserAccount user = new UserAccount();
         user.setUsername(username);
+        user.setFullName(displayName);
+        user.setEmail(normalizeOptional(request.getEmail()));
         user.setRole(role);
         user.setCreatedAt(now);
         UserAccount savedUser = userAccountDao.save(user);
@@ -64,15 +67,18 @@ public class AuthServiceImpl implements AuthService {
         if (role == UserRole.RECRUITER) {
             RecruiterProfile recruiterProfile = new RecruiterProfile();
             recruiterProfile.setUserId(savedUser.getId());
-            recruiterProfile.setDisplayName(username);
-            recruiterProfile.setCompanyName("");
+            recruiterProfile.setDisplayName(displayName);
+            recruiterProfile.setCompanyName(normalizeOptional(request.getCompanyName()));
+            recruiterProfile.setEmail(normalizeOptional(request.getEmail()));
             recruiterProfile.setCreatedAt(now);
             RecruiterProfile savedRecruiter = recruiterProfileDao.save(recruiterProfile);
             savedUser.setProfileId(savedRecruiter.getId());
         } else {
             StudentProfile studentProfile = new StudentProfile();
             studentProfile.setUserId(savedUser.getId());
-            studentProfile.setDisplayName(username);
+            studentProfile.setDisplayName(displayName);
+            studentProfile.setEmail(normalizeOptional(request.getEmail()));
+            studentProfile.setCollegeName(normalizeOptional(request.getCollegeName()));
             studentProfile.setBio("");
             studentProfile.setSkills(List.of());
             studentProfile.setCreatedAt(now);
@@ -88,14 +94,36 @@ public class AuthServiceImpl implements AuthService {
         SignInResponse response = new SignInResponse();
         response.setUserId(user.getId());
         response.setUsername(user.getUsername());
+        response.setFullName(user.getFullName());
+        response.setEmail(user.getEmail());
         response.setRole(user.getRole().name());
         response.setProfileId(user.getProfileId());
+        if (user.getRole() == UserRole.RECRUITER && user.getProfileId() != null) {
+            recruiterProfileDao
+                .findById(user.getProfileId())
+                .ifPresent(
+                    p -> response.setCompanyName(p.getCompanyName() != null ? p.getCompanyName() : "")
+                );
+        }
         response.setNewUser(isNewUser);
         return response;
     }
 
     private String normalizeUsername(String username) {
         return username == null ? "" : username.trim().toLowerCase();
+    }
+
+    private String resolveDisplayName(String fullName, String usernameFallback) {
+        String normalized = normalizeOptional(fullName);
+        return normalized == null || normalized.isBlank() ? usernameFallback : normalized;
+    }
+
+    private String normalizeOptional(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
 
     private UserRole parseRole(String role) {

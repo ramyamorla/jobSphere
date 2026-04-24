@@ -12,6 +12,8 @@ public class StudentProfile {
     private String id;
     private String userId;
     private String displayName;
+    private String email;
+    private String collegeName;
     private String bio;
     private List<String> skills;
     private Instant createdAt;
@@ -38,6 +40,22 @@ public class StudentProfile {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getCollegeName() {
+        return collegeName;
+    }
+
+    public void setCollegeName(String collegeName) {
+        this.collegeName = collegeName;
     }
 
     public String getBio() {

@@ -9,5 +9,7 @@ public interface JobService {
 
     List<JobResponse> getAllJobs();
 
+    List<JobResponse> searchJobs(String keyword, String location, String jobType, String workMode, Integer minSalary);
+
     void deleteJobById(String jobId);
 }

@@ -22,11 +22,23 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobResponse createJob(CreateJobRequest request) {
+        if (request.getMaxSalary() < request.getMinSalary()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "maxSalary must be >= minSalary");
+        }
+
         Job job = new Job();
         job.setTitle(request.getTitle());
         job.setCompanyName(request.getCompanyName());
         job.setLocation(request.getLocation());
         job.setJobType(request.getJobType());
+        job.setWorkMode(request.getWorkMode());
+        job.setExperienceLevel(request.getExperienceLevel());
+        job.setMinSalary(request.getMinSalary());
+        job.setMaxSalary(request.getMaxSalary());
+        job.setSalaryCurrency(request.getSalaryCurrency());
+        job.setTotalPositions(request.getTotalPositions());
+        job.setOpenPositions(request.getTotalPositions());
+        job.setRequiredSkills(request.getRequiredSkills());
         job.setPostedByRecruiterId(request.getPostedByRecruiterId());
         job.setCreatedAt(Instant.now());
 
@@ -37,6 +49,19 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<JobResponse> getAllJobs() {
         return jobDao.findAllOrderByCreatedAtDesc().stream()
+            .map(this::toResponse)
+            .toList();
+    }
+
+    @Override
+    public List<JobResponse> searchJobs(
+        String keyword,
+        String location,
+        String jobType,
+        String workMode,
+        Integer minSalary
+    ) {
+        return jobDao.search(keyword, location, jobType, workMode, minSalary).stream()
             .map(this::toResponse)
             .toList();
     }
@@ -56,6 +81,14 @@ public class JobServiceImpl implements JobService {
         response.setCompanyName(job.getCompanyName());
         response.setLocation(job.getLocation());
         response.setJobType(job.getJobType());
+        response.setWorkMode(job.getWorkMode());
+        response.setExperienceLevel(job.getExperienceLevel());
+        response.setMinSalary(job.getMinSalary());
+        response.setMaxSalary(job.getMaxSalary());
+        response.setSalaryCurrency(job.getSalaryCurrency());
+        response.setTotalPositions(job.getTotalPositions());
+        response.setOpenPositions(job.getOpenPositions());
+        response.setRequiredSkills(job.getRequiredSkills());
         response.setPostedByRecruiterId(job.getPostedByRecruiterId());
         response.setCreatedAt(job.getCreatedAt());
         return response;

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,8 +33,17 @@ public class JobController {
     }
 
     @GetMapping
-    public List<JobResponse> getAllJobs() {
-        return jobService.getAllJobs();
+    public List<JobResponse> getAllJobs(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) String location,
+        @RequestParam(required = false) String jobType,
+        @RequestParam(required = false) String workMode,
+        @RequestParam(required = false) Integer minSalary
+    ) {
+        if (keyword == null && location == null && jobType == null && workMode == null && minSalary == null) {
+            return jobService.getAllJobs();
+        }
+        return jobService.searchJobs(keyword, location, jobType, workMode, minSalary);
     }
 
     @DeleteMapping("/{jobId}")

@@ -12,6 +12,7 @@ public class RecruiterProfile {
     private String userId;
     private String displayName;
     private String companyName;
+    private String email;
     private Instant createdAt;
 
     public String getId() {
@@ -44,6 +45,14 @@ public class RecruiterProfile {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Instant getCreatedAt() {

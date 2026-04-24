@@ -1,4 +1,8 @@
 export const authEntryInitialState = {
   username: "",
-  role: "STUDENT"
+  role: "STUDENT",
+  fullName: "",
+  email: "",
+  companyName: "",
+  collegeName: ""
 };
