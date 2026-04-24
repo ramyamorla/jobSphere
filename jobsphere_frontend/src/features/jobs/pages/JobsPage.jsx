@@ -4,13 +4,17 @@ import JobList from "../components/JobList";
 import { emptyCreateJobRequest } from "../dto/jobDto";
 import { createJob, fetchJobs, removeJob } from "../service/jobService";
 
-export default function JobsPage() {
+export default function JobsPage({ user, onSignOut }) {
   const [jobs, setJobs] = useState([]);
-  const [formData, setFormData] = useState(emptyCreateJobRequest);
+  const [formData, setFormData] = useState({
+    ...emptyCreateJobRequest,
+    postedByRecruiterId: user?.profileId || ""
+  });
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const isRecruiter = user?.role === "RECRUITER";
 
   async function loadJobs() {
     setLoading(true);
@@ -40,9 +44,15 @@ export default function JobsPage() {
     setMessage("");
     setError("");
     try {
-      await createJob(formData);
+      await createJob({
+        ...formData,
+        postedByRecruiterId: user?.profileId || formData.postedByRecruiterId
+      });
       setMessage("Job created successfully.");
-      setFormData(emptyCreateJobRequest);
+      setFormData({
+        ...emptyCreateJobRequest,
+        postedByRecruiterId: user?.profileId || ""
+      });
       await loadJobs();
     } catch (err) {
       setError("Job creation failed. Verify backend and request fields.");
@@ -68,22 +78,40 @@ export default function JobsPage() {
 
   return (
     <main className="container">
-      <h1>jobSphere - Jobs Module</h1>
-      <p className="subtitle">Chunk 3: Frontend + Backend full flow for job creation and listing.</p>
+      <div className="jobs-header">
+        <div>
+          <h2>Jobs Module</h2>
+          <p className="subtitle">
+            Signed in as <strong>{user?.username}</strong> ({user?.role})
+          </p>
+        </div>
+        <button type="button" className="secondary-btn" onClick={onSignOut}>
+          Sign Out
+        </button>
+      </div>
       {message && <p className="success">{message}</p>}
       {error && <p className="error">{error}</p>}
       <div className="grid">
-        <JobForm
-          formData={formData}
-          onChange={handleInputChange}
-          onSubmit={handleSubmit}
-          loading={loading}
-        />
+        {isRecruiter ? (
+          <JobForm
+            formData={formData}
+            onChange={handleInputChange}
+            onSubmit={handleSubmit}
+            loading={loading}
+            recruiterProfileId={user?.profileId}
+          />
+        ) : (
+          <section className="card info-card">
+            <h2>Student Mode</h2>
+            <p className="subtitle">You can browse jobs. Posting and deleting are recruiter-only actions.</p>
+          </section>
+        )}
         <JobList
           jobs={jobs}
           loading={loading}
           onDelete={handleDelete}
           deletingId={deletingId}
+          canDelete={isRecruiter}
         />
       </div>
     </main>

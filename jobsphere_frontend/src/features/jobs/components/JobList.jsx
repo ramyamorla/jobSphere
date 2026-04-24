@@ -1,4 +1,4 @@
-export default function JobList({ jobs, loading, onDelete, deletingId }) {
+export default function JobList({ jobs, loading, onDelete, deletingId, canDelete }) {
   return (
     <section className="card">
       <h2>Available Jobs</h2>
@@ -14,14 +14,16 @@ export default function JobList({ jobs, loading, onDelete, deletingId }) {
             <p>
               Type: {job.jobType} | Recruiter: {job.postedByRecruiterId}
             </p>
-            <button
-              type="button"
-              className="danger-btn"
-              onClick={() => onDelete(job.id)}
-              disabled={deletingId === job.id}
-            >
-              {deletingId === job.id ? "Deleting..." : "Delete Job"}
-            </button>
+            {canDelete && (
+              <button
+                type="button"
+                className="danger-btn"
+                onClick={() => onDelete(job.id)}
+                disabled={deletingId === job.id}
+              >
+                {deletingId === job.id ? "Deleting..." : "Delete Job"}
+              </button>
+            )}
           </li>
         ))}
       </ul>

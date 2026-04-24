@@ -1,4 +1,4 @@
-export default function JobForm({ formData, onChange, onSubmit, loading }) {
+export default function JobForm({ formData, onChange, onSubmit, loading, recruiterProfileId }) {
   return (
     <section className="card">
       <h2>Create Job</h2>
@@ -47,9 +47,10 @@ export default function JobForm({ formData, onChange, onSubmit, loading }) {
           Recruiter ID
           <input
             name="postedByRecruiterId"
-            value={formData.postedByRecruiterId}
+            value={recruiterProfileId || formData.postedByRecruiterId}
             onChange={onChange}
-            placeholder="recruiter-001"
+            placeholder="recruiter-profile-id"
+            readOnly={Boolean(recruiterProfileId)}
             required
           />
         </label>
