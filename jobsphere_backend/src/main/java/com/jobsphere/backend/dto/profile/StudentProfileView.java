@@ -1,24 +1,16 @@
-package com.jobsphere.backend.model;
+package com.jobsphere.backend.dto.profile;
 
-import java.time.Instant;
 import java.util.List;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "students")
-public class StudentProfile {
+public class StudentProfileView {
 
-    @Id
     private String id;
-    private String userId;
     private String displayName;
     private String email;
     private String collegeName;
     private String bio;
     private List<String> skills;
     private String resumeUrl;
-    private Instant createdAt;
-    private Instant updatedAt;
 
     public String getId() {
         return id;
@@ -26,14 +18,6 @@ public class StudentProfile {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getDisplayName() {
@@ -82,21 +66,5 @@ public class StudentProfile {
 
     public void setResumeUrl(String resumeUrl) {
         this.resumeUrl = resumeUrl;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

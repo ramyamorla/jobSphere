@@ -3,6 +3,7 @@ package com.jobsphere.backend.dao.impl;
 import com.jobsphere.backend.dao.StudentProfileDao;
 import com.jobsphere.backend.model.StudentProfile;
 import com.jobsphere.backend.repository.StudentProfileRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,5 +18,10 @@ public class StudentProfileDaoImpl implements StudentProfileDao {
     @Override
     public StudentProfile save(StudentProfile studentProfile) {
         return studentProfileRepository.save(studentProfile);
+    }
+
+    @Override
+    public Optional<StudentProfile> findById(String id) {
+        return studentProfileRepository.findById(id);
     }
 }

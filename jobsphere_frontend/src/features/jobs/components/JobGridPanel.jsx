@@ -11,7 +11,10 @@ export default function JobGridPanel({
   onResetFilters,
   onDelete,
   deletingId,
-  canDelete
+  canDelete,
+  showApply = false,
+  onApply,
+  applyingId = ""
 }) {
   return (
     <section className="card job-grid-panel">
@@ -98,6 +101,9 @@ export default function JobGridPanel({
           onDelete={onDelete}
           deletingId={deletingId}
           canDelete={canDelete}
+          showApply={showApply}
+          onApply={onApply}
+          applyingId={applyingId}
           embedded
         />
       </div>

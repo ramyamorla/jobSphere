@@ -4,6 +4,7 @@ import com.jobsphere.backend.dao.JobDao;
 import com.jobsphere.backend.model.Job;
 import com.jobsphere.backend.repository.JobRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -62,6 +63,11 @@ public class JobDaoImpl implements JobDao {
         }
 
         return mongoTemplate.find(query, Job.class);
+    }
+
+    @Override
+    public Optional<Job> findById(String jobId) {
+        return jobRepository.findById(jobId);
     }
 
     @Override

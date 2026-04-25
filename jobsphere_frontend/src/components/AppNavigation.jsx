@@ -3,7 +3,9 @@ const menuByRole = {
     { key: "dashboard", label: "Dashboard" },
     { key: "post-job", label: "Post Job" },
     { key: "my-jobs", label: "My Jobs" },
-    { key: "applicants", label: "Applicants" }
+    { key: "applicants", label: "Applicants" },
+    { key: "browse-jobs", label: "Browse Jobs" },
+    { key: "profile", label: "Profile" }
   ],
   STUDENT: [
     { key: "dashboard", label: "Dashboard" },

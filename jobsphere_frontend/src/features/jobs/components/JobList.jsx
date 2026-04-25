@@ -1,4 +1,14 @@
-export default function JobList({ jobs, loading, onDelete, deletingId, canDelete, embedded = false }) {
+export default function JobList({
+  jobs,
+  loading,
+  onDelete,
+  deletingId,
+  canDelete,
+  embedded = false,
+  showApply = false,
+  onApply,
+  applyingId = ""
+}) {
   const tableBlock = (
     <>
       {loading && <p className="job-table-status">Loading…</p>}
@@ -16,7 +26,7 @@ export default function JobList({ jobs, loading, onDelete, deletingId, canDelete
               <th>Salary</th>
               <th>Openings</th>
               <th>Skills</th>
-              {canDelete && <th>Action</th>}
+              {(canDelete || showApply) && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -37,16 +47,27 @@ export default function JobList({ jobs, loading, onDelete, deletingId, canDelete
                   </span>
                 </td>
                 <td>{(job.requiredSkills || []).join(", ") || "—"}</td>
-                {canDelete && (
+                {(canDelete || showApply) && (
                   <td>
-                    <button
-                      type="button"
-                      className="danger-btn danger-btn--table"
-                      onClick={() => onDelete(job.id)}
-                      disabled={deletingId === job.id}
-                    >
-                      {deletingId === job.id ? "…" : "Delete"}
-                    </button>
+                    {canDelete ? (
+                      <button
+                        type="button"
+                        className="danger-btn danger-btn--table"
+                        onClick={() => onDelete(job.id)}
+                        disabled={deletingId === job.id}
+                      >
+                        {deletingId === job.id ? "…" : "Delete"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="primary-btn"
+                        onClick={() => onApply(job.id)}
+                        disabled={applyingId === job.id || job.openPositions <= 0}
+                      >
+                        {job.openPositions <= 0 ? "Closed" : applyingId === job.id ? "Applying…" : "Apply"}
+                      </button>
+                    )}
                   </td>
                 )}
               </tr>

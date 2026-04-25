@@ -1,4 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../../../config/apiConfig";
+import {
+  applyToJob,
+  fetchRecruiterApplications,
+  fetchStudentApplications,
+  updateApplicationStatus
+} from "../../applications/service/applicationService";
+import {
+  fetchRecruiterProfile,
+  fetchStudentProfile,
+  updateRecruiterProfile,
+  updateStudentProfile,
+  uploadStudentResume
+} from "../../profile/api/profileApi";
 import JobForm from "../components/JobForm";
 import JobGridPanel from "../components/JobGridPanel";
 import { fetchRecruiterProfileById } from "../../profile/api/recruiterApi";
@@ -18,6 +32,17 @@ function viewTitle(activeView) {
   return map[activeView] || "jobSphere";
 }
 
+function resolveApiPath(path) {
+  if (!path) {
+    return "";
+  }
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  const root = API_BASE_URL.replace(/\/api$/, "");
+  return `${root}${path}`;
+}
+
 export default function JobsPage({ user, onSignOut, activeView }) {
   const [jobs, setJobs] = useState([]);
   const [formData, setFormData] = useState({
@@ -27,9 +52,30 @@ export default function JobsPage({ user, onSignOut, activeView }) {
   });
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState("");
+  const [applyingId, setApplyingId] = useState("");
+  const [statusUpdatingId, setStatusUpdatingId] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [filters, setFilters] = useState(emptyJobFilters);
+  const [studentProfile, setStudentProfile] = useState({
+    displayName: "",
+    email: "",
+    collegeName: "",
+    bio: "",
+    skills: "",
+    resumeUrl: ""
+  });
+  const [recruiterProfile, setRecruiterProfile] = useState({
+    displayName: "",
+    email: "",
+    companyName: ""
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [applications, setApplications] = useState([]);
+  const [applicants, setApplicants] = useState([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
   const isRecruiter = user?.role === "RECRUITER";
 
   const myPostedJobs = useMemo(
@@ -122,6 +168,44 @@ export default function JobsPage({ user, onSignOut, activeView }) {
     });
   }, [activeView, isRecruiter, user?.companyName, user?.profileId]);
 
+  useEffect(() => {
+    if (activeView !== "profile" || !user?.profileId) {
+      return;
+    }
+    const loadProfile = async () => {
+      setProfileLoading(true);
+      setError("");
+      try {
+        if (isRecruiter) {
+          const profile = await fetchRecruiterProfile(user.profileId);
+          setRecruiterProfile(profile);
+        } else {
+          const profile = await fetchStudentProfile(user.profileId);
+          setStudentProfile({ ...profile, skills: (profile.skills || []).join(", ") });
+        }
+      } catch {
+        setError("Unable to load profile.");
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+    loadProfile();
+  }, [activeView, isRecruiter, user?.profileId]);
+
+  useEffect(() => {
+    if (activeView !== "my-applications" || isRecruiter || !user?.profileId) {
+      return;
+    }
+    loadStudentApplications();
+  }, [activeView, isRecruiter, user?.profileId]);
+
+  useEffect(() => {
+    if (activeView !== "applicants" || !isRecruiter || !user?.profileId) {
+      return;
+    }
+    loadRecruiterApplicants();
+  }, [activeView, isRecruiter, user?.profileId]);
+
   function handleInputChange(event) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -177,6 +261,139 @@ export default function JobsPage({ user, onSignOut, activeView }) {
       setError("Delete failed.");
     } finally {
       setDeletingId("");
+    }
+  }
+
+  async function handleApplyToJob(jobId) {
+    if (!user?.profileId) {
+      return;
+    }
+    setApplyingId(jobId);
+    setError("");
+    setMessage("");
+    try {
+      await applyToJob({
+        jobId,
+        studentProfileId: user.profileId,
+        coverLetter: ""
+      });
+      setMessage("Application submitted.");
+      await loadJobs();
+      await loadStudentApplications();
+    } catch (err) {
+      setError(err?.message || "Application failed.");
+    } finally {
+      setApplyingId("");
+    }
+  }
+
+  async function loadStudentApplications() {
+    if (!user?.profileId) {
+      return;
+    }
+    setApplicationsLoading(true);
+    try {
+      const rows = await fetchStudentApplications(user.profileId);
+      setApplications(rows);
+    } catch {
+      setError("Unable to load applications.");
+    } finally {
+      setApplicationsLoading(false);
+    }
+  }
+
+  async function loadRecruiterApplicants() {
+    if (!user?.profileId) {
+      return;
+    }
+    setApplicationsLoading(true);
+    try {
+      const rows = await fetchRecruiterApplications(user.profileId);
+      setApplicants(rows);
+    } catch {
+      setError("Unable to load applicants.");
+    } finally {
+      setApplicationsLoading(false);
+    }
+  }
+
+  async function handleUpdateApplicationStatus(applicationId, status) {
+    setStatusUpdatingId(applicationId);
+    setError("");
+    try {
+      await updateApplicationStatus(applicationId, status);
+      await loadRecruiterApplicants();
+      setMessage("Applicant status updated.");
+    } catch {
+      setError("Unable to update status.");
+    } finally {
+      setStatusUpdatingId("");
+    }
+  }
+
+  function handleStudentProfileField(event) {
+    const { name, value } = event.target;
+    setStudentProfile((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleRecruiterProfileField(event) {
+    const { name, value } = event.target;
+    setRecruiterProfile((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSaveStudentProfile(event) {
+    event.preventDefault();
+    setProfileSaving(true);
+    setError("");
+    try {
+      const payload = {
+        ...studentProfile,
+        skills: (studentProfile.skills || "")
+          .toString()
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      };
+      const updated = await updateStudentProfile(user.profileId, payload);
+      setStudentProfile({ ...updated, skills: (updated.skills || []).join(", ") });
+      setMessage("Profile updated.");
+    } catch {
+      setError("Unable to save student profile.");
+    } finally {
+      setProfileSaving(false);
+    }
+  }
+
+  async function handleSaveRecruiterProfile(event) {
+    event.preventDefault();
+    setProfileSaving(true);
+    setError("");
+    try {
+      const updated = await updateRecruiterProfile(user.profileId, recruiterProfile);
+      setRecruiterProfile(updated);
+      setMessage("Profile updated.");
+    } catch {
+      setError("Unable to save recruiter profile.");
+    } finally {
+      setProfileSaving(false);
+    }
+  }
+
+  async function handleResumeFileChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    setResumeUploading(true);
+    setError("");
+    try {
+      const updated = await uploadStudentResume(user.profileId, file);
+      setStudentProfile((prev) => ({ ...prev, resumeUrl: updated.resumeUrl }));
+      setMessage("Resume uploaded.");
+    } catch {
+      setError("Resume upload failed.");
+    } finally {
+      setResumeUploading(false);
     }
   }
 
@@ -301,6 +518,9 @@ export default function JobsPage({ user, onSignOut, activeView }) {
             onDelete={handleDelete}
             deletingId={deletingId}
             canDelete={false}
+            showApply={!isRecruiter}
+            onApply={handleApplyToJob}
+            applyingId={applyingId}
           />
         </div>
       )}
@@ -308,21 +528,161 @@ export default function JobsPage({ user, onSignOut, activeView }) {
       {activeView === "applicants" && (
         <section className="card view-full">
           <h2>Applicants</h2>
-          <p className="page-subtitle">Pipeline view will land here in the next release.</p>
+          {applicationsLoading && <p className="page-subtitle">Loading applicants...</p>}
+          {!applicationsLoading && applicants.length === 0 && <p className="page-subtitle">No applicants yet.</p>}
+          {!applicationsLoading && applicants.length > 0 && (
+            <div className="table-wrap">
+              <table className="jobs-table">
+                <thead>
+                  <tr>
+                    <th>Job</th>
+                    <th>Student Profile</th>
+                    <th>Status</th>
+                    <th>Resume</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {applicants.map((row) => (
+                    <tr key={row.id}>
+                      <td>{row.jobTitle}</td>
+                      <td>{row.studentProfileId}</td>
+                      <td>{row.status}</td>
+                      <td>{row.resumeUrl ? <a href={resolveApiPath(row.resumeUrl)}>View</a> : "—"}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="secondary-btn"
+                          disabled={statusUpdatingId === row.id}
+                          onClick={() => handleUpdateApplicationStatus(row.id, "SHORTLISTED")}
+                        >
+                          Shortlist
+                        </button>
+                        <button
+                          type="button"
+                          className="danger-btn danger-btn--table"
+                          disabled={statusUpdatingId === row.id}
+                          onClick={() => handleUpdateApplicationStatus(row.id, "REJECTED")}
+                        >
+                          Reject
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       )}
 
       {activeView === "my-applications" && (
         <section className="card view-full">
           <h2>My applications</h2>
-          <p className="page-subtitle">Application status will appear here next.</p>
+          {applicationsLoading && <p className="page-subtitle">Loading applications...</p>}
+          {!applicationsLoading && applications.length === 0 && (
+            <p className="page-subtitle">No applications yet.</p>
+          )}
+          {!applicationsLoading && applications.length > 0 && (
+            <div className="table-wrap">
+              <table className="jobs-table">
+                <thead>
+                  <tr>
+                    <th>Job</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Applied</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {applications.map((row) => (
+                    <tr key={row.id}>
+                      <td>{row.jobTitle}</td>
+                      <td>{row.companyName}</td>
+                      <td>{row.status}</td>
+                      <td>{row.appliedAt ? new Date(row.appliedAt).toLocaleString() : "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       )}
 
       {activeView === "profile" && (
         <section className="card view-full">
           <h2>Profile</h2>
-          <p className="page-subtitle">Profile and resume management coming next.</p>
+          {profileLoading && <p className="page-subtitle">Loading profile...</p>}
+          {!profileLoading && !isRecruiter && (
+            <form className="form-grid" onSubmit={handleSaveStudentProfile}>
+              <label>
+                Full name
+                <input name="displayName" value={studentProfile.displayName || ""} onChange={handleStudentProfileField} />
+              </label>
+              <label>
+                Email
+                <input name="email" value={studentProfile.email || ""} onChange={handleStudentProfileField} />
+              </label>
+              <label>
+                College
+                <input name="collegeName" value={studentProfile.collegeName || ""} onChange={handleStudentProfileField} />
+              </label>
+              <label>
+                Skills (comma separated)
+                <input
+                  name="skills"
+                  value={studentProfile.skills || ""}
+                  onChange={handleStudentProfileField}
+                />
+              </label>
+              <label>
+                Bio
+                <input name="bio" value={studentProfile.bio || ""} onChange={handleStudentProfileField} />
+              </label>
+              <label>
+                Resume
+                <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeFileChange} disabled={resumeUploading} />
+              </label>
+              {studentProfile.resumeUrl && (
+                <p>
+                  <a href={resolveApiPath(studentProfile.resumeUrl)} target="_blank" rel="noreferrer">
+                    View uploaded resume
+                  </a>
+                </p>
+              )}
+              <button type="submit" disabled={profileSaving || resumeUploading}>
+                {profileSaving ? "Saving..." : "Save Profile"}
+              </button>
+            </form>
+          )}
+          {!profileLoading && isRecruiter && (
+            <form className="form-grid" onSubmit={handleSaveRecruiterProfile}>
+              <label>
+                Full name
+                <input
+                  name="displayName"
+                  value={recruiterProfile.displayName || ""}
+                  onChange={handleRecruiterProfileField}
+                />
+              </label>
+              <label>
+                Email
+                <input name="email" value={recruiterProfile.email || ""} onChange={handleRecruiterProfileField} />
+              </label>
+              <label>
+                Company name
+                <input
+                  name="companyName"
+                  value={recruiterProfile.companyName || ""}
+                  onChange={handleRecruiterProfileField}
+                />
+              </label>
+              <button type="submit" disabled={profileSaving}>
+                {profileSaving ? "Saving..." : "Save Profile"}
+              </button>
+            </form>
+          )}
         </section>
       )}
     </main>

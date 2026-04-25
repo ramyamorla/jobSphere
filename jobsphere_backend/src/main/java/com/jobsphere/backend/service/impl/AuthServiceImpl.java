@@ -71,6 +71,7 @@ public class AuthServiceImpl implements AuthService {
             recruiterProfile.setCompanyName(normalizeOptional(request.getCompanyName()));
             recruiterProfile.setEmail(normalizeOptional(request.getEmail()));
             recruiterProfile.setCreatedAt(now);
+            recruiterProfile.setUpdatedAt(now);
             RecruiterProfile savedRecruiter = recruiterProfileDao.save(recruiterProfile);
             savedUser.setProfileId(savedRecruiter.getId());
         } else {
@@ -82,6 +83,7 @@ public class AuthServiceImpl implements AuthService {
             studentProfile.setBio("");
             studentProfile.setSkills(List.of());
             studentProfile.setCreatedAt(now);
+            studentProfile.setUpdatedAt(now);
             StudentProfile savedStudent = studentProfileDao.save(studentProfile);
             savedUser.setProfileId(savedStudent.getId());
         }
