@@ -16,97 +16,84 @@ export default function JobGridPanel({
   onApply,
   applyingId = ""
 }) {
-  return (
-    <section className="card job-grid-panel">
-      <div className="job-grid-panel-head">
-        <h2>{title}</h2>
-        <span className="job-grid-count">{loading ? "…" : `${jobs.length} result${jobs.length === 1 ? "" : "s"}`}</span>
-      </div>
+  const activeFilterCount = Object.values(filters || {}).filter((v) => v && v !== "").length;
 
+  return (
+    <div className="jgp-shell">
+      {/* Filter bar */}
       <form
-        className="job-grid-toolbar"
+        className="jgp-filters"
         onSubmit={(e) => {
           e.preventDefault();
           onApplyFilters();
         }}
       >
-        <div className="job-grid-toolbar-fields">
-          <label className="job-grid-field">
-            <span>Search</span>
+        <div className="jgp-filters-row">
+          <label className="jgp-field jgp-field--search">
+            <span className="jgp-field-icon">🔍</span>
             <input
               name="keyword"
               value={filters.keyword}
               onChange={onFilterChange}
-              placeholder="Title or company"
+              placeholder="Search by title or company..."
             />
           </label>
-          <label className="job-grid-field">
-            <span>Location</span>
+          <label className="jgp-field">
             <select name="location" value={filters.location} onChange={onFilterChange}>
-              <option value="">All</option>
-              {locationOptions.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
-              ))}
+              <option value="">All locations</option>
+              {locationOptions.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           </label>
-          <label className="job-grid-field">
-            <span>Type</span>
+          <label className="jgp-field">
             <select name="jobType" value={filters.jobType} onChange={onFilterChange}>
-              <option value="">All</option>
-              {jobTypeOptions.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
-              ))}
+              <option value="">Any type</option>
+              {jobTypeOptions.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           </label>
-          <label className="job-grid-field">
-            <span>Mode</span>
+          <label className="jgp-field">
             <select name="workMode" value={filters.workMode} onChange={onFilterChange}>
-              <option value="">All</option>
-              {workModeOptions.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
-              ))}
+              <option value="">Any mode</option>
+              {workModeOptions.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           </label>
-          <label className="job-grid-field job-grid-field--salary">
-            <span>Min salary</span>
+          <label className="jgp-field jgp-field--mini">
             <input
               type="number"
               name="minSalary"
               value={filters.minSalary}
               onChange={onFilterChange}
-              placeholder="Min"
+              placeholder="Min salary"
             />
           </label>
-        </div>
-        <div className="job-grid-toolbar-actions">
-          <button type="submit" className="primary-btn" disabled={loading}>
-            {loading ? "Updating…" : "Apply"}
+          <button type="submit" className="jgp-btn-apply" disabled={loading}>
+            {loading ? "…" : "Apply"}
           </button>
-          <button type="button" className="secondary-btn" onClick={onResetFilters} disabled={loading}>
-            Clear
-          </button>
+          {activeFilterCount > 0 && (
+            <button type="button" className="jgp-btn-clear" onClick={onResetFilters} disabled={loading}>
+              Clear
+            </button>
+          )}
         </div>
       </form>
 
-      <div className="job-grid-table-region">
-        <JobList
-          jobs={jobs}
-          loading={loading}
-          onDelete={onDelete}
-          deletingId={deletingId}
-          canDelete={canDelete}
-          showApply={showApply}
-          onApply={onApply}
-          applyingId={applyingId}
-          embedded
-        />
+      {/* Result count */}
+      <div className="jgp-results-bar">
+        <span className="jgp-results-count">
+          {loading ? "Loading…" : `${jobs.length} ${jobs.length === 1 ? "result" : "results"}`}
+        </span>
       </div>
-    </section>
+
+      {/* Job cards */}
+      <JobList
+        jobs={jobs}
+        loading={loading}
+        onDelete={onDelete}
+        deletingId={deletingId}
+        canDelete={canDelete}
+        showApply={showApply}
+        onApply={onApply}
+        applyingId={applyingId}
+      />
+    </div>
   );
 }

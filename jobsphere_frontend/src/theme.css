@@ -1,0 +1,404 @@
+/* Final override theme: JobSewa-inspired clean portal */
+:root {
+  --js-bg: #f3f4f6;
+  --js-surface: #ffffff;
+  --js-border: #e5e7eb;
+  --js-text: #111827;
+  --js-muted: #6b7280;
+  --js-primary: #2563eb;
+  --js-primary-2: #7c3aed;
+}
+
+body {
+  background: var(--js-bg);
+  color: var(--js-text);
+}
+
+.brand-header-global {
+  background: #ffffff;
+  border-bottom: 1px solid var(--js-border);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.brand-header-global .brand-header-text h1 {
+  color: #111827;
+}
+
+.brand-header-global .brand-header-text p {
+  color: var(--js-muted);
+}
+
+.brand-header-logo-wrap .interactive-logo-orb {
+  display: none;
+}
+
+.brand-header-logo-wrap .interactive-logo-plate {
+  border-radius: 10px;
+  border: 1px solid #dbe1ee;
+  box-shadow: none;
+  background: #fff;
+}
+
+.revamp-app-shell {
+  background: var(--js-bg);
+}
+
+.revamp-page-layout {
+  padding-top: 86px;
+  max-width: 1220px;
+  margin: 0 auto;
+  min-height: calc(100vh - 86px);
+  gap: 0.9rem;
+}
+
+.revamp-top-nav {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid var(--js-border);
+  background: #fff;
+  box-shadow: none;
+}
+
+.revamp-top-nav-brand strong {
+  color: #111827;
+}
+
+.revamp-top-nav-brand span {
+  color: var(--js-muted);
+}
+
+.revamp-nav-item {
+  background: #f9fafb;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.revamp-nav-item:hover {
+  background: #f3f4f6;
+  transform: none;
+}
+
+.revamp-nav-item.active {
+  background: #111827;
+  border-color: #111827;
+  color: #fff;
+  box-shadow: none;
+}
+
+.revamp-nav-item--soft {
+  background: #ffffff;
+}
+
+.revamp-nav-item--cta {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.revamp-content-scroll {
+  padding: 0 0 1rem;
+}
+
+.page-main,
+.revamp-home {
+  max-width: 100%;
+}
+
+.page-toolbar,
+.card,
+.table-wrap,
+.job-grid-panel {
+  background: #fff;
+  border: 1px solid var(--js-border);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.page-title,
+.card h2,
+.card h3 {
+  color: #111827;
+}
+
+.page-subtitle,
+.view-hint,
+.dashboard-lead,
+.dashboard-checklist {
+  color: var(--js-muted);
+}
+
+.metric-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.metric-card span {
+  color: var(--js-muted);
+}
+
+.metric-card strong {
+  color: #111827;
+}
+
+.job-grid-panel-head,
+.job-grid-toolbar {
+  background: #fff;
+}
+
+.job-grid-field span,
+.form-grid label {
+  color: #6b7280;
+}
+
+.job-grid-field input,
+.job-grid-field select,
+.form-grid input,
+.form-grid select {
+  background: #fff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+}
+
+.job-grid-field input:focus,
+.job-grid-field select:focus,
+.form-grid input:focus,
+.form-grid select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.35);
+}
+
+.jobs-table {
+  color: #111827;
+}
+
+.jobs-table th {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.jobs-table tbody tr:hover td {
+  background: #f9fafb;
+}
+
+.primary-btn,
+.form-grid button:not(.secondary-btn),
+.auth-btn--dark-primary {
+  background: linear-gradient(92deg, var(--js-primary), var(--js-primary-2));
+  color: #fff;
+  border: none;
+  box-shadow: none;
+}
+
+.primary-btn:hover,
+.form-grid button:not(.secondary-btn):hover,
+.auth-btn--dark-primary:hover:not(:disabled) {
+  transform: none;
+  background: linear-gradient(92deg, #1d4ed8, #6d28d9);
+}
+
+.secondary-btn {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.secondary-btn:hover {
+  background: #f9fafb;
+}
+
+.danger-btn {
+  background: #fff;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.danger-btn:hover {
+  background: #fef2f2;
+}
+
+.flash--ok {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.flash--err {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Home page cleanup */
+.revamp-home {
+  padding: 95px 0 1rem;
+}
+
+.landing-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  background: #fff;
+  border: 1px solid var(--js-border);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.landing-top-brand {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #111827;
+}
+
+.landing-top-brand span {
+  color: #ef4444;
+}
+
+.landing-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.landing-top-actions button {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111827;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.landing-top-actions button:hover {
+  background: #f9fafb;
+}
+
+.home-v2-hero,
+.home-v2-feature-card,
+.revamp-home-feed,
+.landing-auth-card.auth-formal-card--dark {
+  border: 1px solid var(--js-border);
+  background: #fff;
+  box-shadow: none;
+}
+
+.revamp-home-kicker {
+  color: #7c3aed;
+}
+
+.revamp-home-hero-head h1 {
+  color: #111827;
+}
+
+.revamp-home-hero-head p,
+.home-v2-feature-card p,
+.revamp-job-card p,
+.revamp-home-stats span {
+  color: var(--js-muted);
+}
+
+.revamp-home-search input,
+.home-v2-tag,
+.revamp-job-card {
+  background: #fff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.home-v2-tag:hover {
+  background: #f9fafb;
+}
+
+.home-v2-logo-shell {
+  border: 1px solid var(--js-border);
+  background: #f9fafb;
+}
+
+.home-v2-role-actions .secondary-btn {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.home-v2-role-actions .secondary-btn:hover {
+  background: #1f2937;
+}
+
+.landing-auth-card .auth-formal-title--dark {
+  color: #111827;
+}
+
+.landing-auth-card .auth-mode-seg {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.landing-auth-card .auth-mode-seg__btn {
+  color: #6b7280;
+}
+
+.landing-auth-card .auth-mode-seg__btn--active {
+  color: #111827;
+  background: #fff;
+  border: 1px solid #d1d5db;
+}
+
+.landing-auth-card .auth-field-dark__label {
+  color: #6b7280;
+}
+
+.landing-auth-card .auth-field-dark input,
+.landing-auth-card .auth-field-dark select {
+  background: #fff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+/* remove exaggerated 3D and missing PNG dependencies */
+.card::before,
+.revamp-home-hero::after,
+.brand-panel::after,
+.landing-auth-card.auth-formal-card--dark::after,
+.interactive-logo-orb {
+  display: none !important;
+}
+
+.revamp-home,
+.brand-panel {
+  background-image: none;
+}
+
+.card:hover,
+.job-grid-panel:hover,
+.table-wrap:hover,
+.revamp-nav-item:hover,
+.revamp-action-tile:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.revamp-job-card:hover {
+  transform: none;
+}
+
+@media (max-width: 960px) {
+  .revamp-page-layout {
+    padding: 86px 0.75rem 0.9rem;
+  }
+
+  .revamp-top-nav {
+    margin-top: 0.55rem;
+  }
+
+  .landing-top-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

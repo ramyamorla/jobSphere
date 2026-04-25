@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import AppNavigation from "./components/AppNavigation";
-import BrandHeader from "./components/BrandHeader";
 import LandingPage from "./features/auth/pages/LandingPage";
 import JobsPage from "./features/jobs/pages/JobsPage";
 import { fetchRecruiterProfileById } from "./features/profile/api/recruiterApi";
@@ -62,20 +61,20 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <BrandHeader
-        fixed
-        centered={false}
-        side="right"
-        title="jobSphere"
-        caption="Smart hiring and career hub"
+    <div className="portal-shell">
+      <AppNavigation
+        user={sessionUser}
+        activeView={activeView}
+        onChangeView={setActiveView}
+        onSignOut={handleSignOut}
       />
-      <div className="app-page app-grid-layout">
-        <AppNavigation user={sessionUser} activeView={activeView} onChangeView={setActiveView} />
-        <section className="app-content-scroll">
-          <JobsPage user={sessionUser} onSignOut={handleSignOut} activeView={activeView} />
-        </section>
-      </div>
+      <main className="portal-content">
+        <JobsPage
+          user={sessionUser}
+          activeView={activeView}
+          onChangeView={setActiveView}
+        />
+      </main>
     </div>
   );
 }

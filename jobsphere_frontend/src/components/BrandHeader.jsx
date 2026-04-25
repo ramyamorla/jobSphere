@@ -1,4 +1,5 @@
 import { useState } from "react";
+import InteractiveLogo from "./InteractiveLogo";
 
 const LOGO_SOURCES = ["/assets/jobsphere_logo.png", "/jobsphere_logo.png"];
 
@@ -30,16 +31,18 @@ export default function BrandHeader({
 
   return (
     <header className={classes}>
-      <img
+      <InteractiveLogo
         src={LOGO_SOURCES[logoSrcIndex]}
         alt="jobSphere logo"
-        className="brand-header-logo"
-        onError={handleLogoError}
+        size={fixed ? "sm" : "md"}
+        className="brand-header-logo-wrap"
       />
       <div className="brand-header-text">
         <h1>{title}</h1>
         <p>{caption}</p>
       </div>
+      {/* fallback pre-load */}
+      <img src={LOGO_SOURCES[logoSrcIndex]} alt="" className="brand-header-logo-fallback" onError={handleLogoError} />
     </header>
   );
 }

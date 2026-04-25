@@ -14,9 +14,11 @@ export default function AuthEntryCard({
   onCreateAccount,
   loading,
   statusTone,
-  onClearStatus
+  onClearStatus,
+  initialMode = "signin",
+  className = ""
 }) {
-  const [mode, setMode] = useState("signin");
+  const [mode, setMode] = useState(initialMode);
   const isRecruiter = formData.role === "RECRUITER";
   const toneClass = statusTone ? `auth-formal-card--${statusTone}` : "";
 
@@ -35,7 +37,7 @@ export default function AuthEntryCard({
   const headerLabel = MODES.find((m) => m.id === mode)?.label ?? "Sign in";
 
   return (
-    <section className={`auth-formal-card auth-formal-card--dark ${toneClass}`.trim()}>
+    <section className={`auth-formal-card auth-formal-card--dark ${toneClass} ${className}`.trim()}>
       <header className="auth-formal-head auth-formal-head--dark">
         <h2 className="auth-formal-title auth-formal-title--dark">{headerLabel}</h2>
       </header>
