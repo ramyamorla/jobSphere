@@ -2,6 +2,13 @@
 
 A full-stack hiring portal that connects **students** looking for jobs with **recruiters** posting openings. Built with React + Vite on the frontend and Spring Boot + MongoDB on the backend.
 
+## Live Demo
+
+- **App:** https://job-sphere-git-main-ramyamorlas-projects.vercel.app/
+- **Backend API:** https://jobsphere-ubvv.onrender.com/api
+
+> Note: the backend is hosted on Render's free tier, so the first request after inactivity may take ~50 seconds to spin up. Just wait a moment and it'll be up.
+
 ---
 
 ## Features
@@ -29,7 +36,10 @@ A full-stack hiring portal that connects **students** looking for jobs with **re
 | Backend | Java 17, Spring Boot 3.3.5 |
 | Database | MongoDB |
 | Build tool | Maven 3.9+ |
-| API base | `http://localhost:8080/api` |
+| API base (local) | `http://localhost:8080/api` |
+| API base (prod) | `https://jobsphere-ubvv.onrender.com/api` |
+| Hosting (frontend) | Vercel |
+| Hosting (backend) | Render |
 
 ---
 
