@@ -6,6 +6,4 @@ spring:
     name: jobsphere-backend
   data:
     mongodb:
-      uri: ${mongodb+srv://morlaramyaasri_db_user:Morlameena%402@jobspherecluster.blnpqcc.mongodb.net/jobsphere?appName=jobspherecluster}
-      #In local, swtch below to uncomment and use
-      #uri: ${MONGODB_URI:mongodb://localhost:27017/jobsphere}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/jobsphere}
