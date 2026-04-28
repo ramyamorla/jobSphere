@@ -1,0 +1,74 @@
+services:
+  # ─────────────────────────────────────────
+  # MongoDB
+  # ─────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: jobsphere-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - jobsphere-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ─────────────────────────────────────────
+  # Spring Boot backend
+  # ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./jobsphere_backend
+      dockerfile: Dockerfile
+    container_name: jobsphere-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/jobsphere
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - jobsphere-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ─────────────────────────────────────────
+  # React + Vite frontend (served by nginx)
+  # ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./jobsphere_frontend
+      dockerfile: Dockerfile
+      args:
+        # In production Docker, nginx proxies /api → backend:8080,
+        # so the relative path is sufficient.
+        VITE_API_BASE_URL: /api
+    container_name: jobsphere-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - jobsphere-net
+
+volumes:
+  mongo_data:
+    name: jobsphere-mongo-data
+
+networks:
+  jobsphere-net:
+    driver: bridge

@@ -1,0 +1,27 @@
+{
+  "name": "jobsphere",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "jobsphere_frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=jobsphere_frontend",
+    "build": "npm run build --workspace=jobsphere_frontend",
+    "preview": "npm run preview --workspace=jobsphere_frontend",
+
+    "backend:dev": "cd jobsphere_backend && mvn spring-boot:run",
+    "backend:build": "cd jobsphere_backend && mvn clean package -DskipTests",
+
+    "docker:up": "docker compose up --build",
+    "docker:up:detach": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:down:volumes": "docker compose down -v",
+    "docker:logs": "docker compose logs -f",
+    "docker:logs:backend": "docker compose logs -f backend",
+    "docker:logs:frontend": "docker compose logs -f frontend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

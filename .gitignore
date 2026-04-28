@@ -1,16 +1,24 @@
-# Frontend
+# ── Frontend ───────────────────────────────────────────────────────────────────
 jobsphere_frontend/node_modules/
 jobsphere_frontend/dist/
 
-# Backend
+# ── Backend ────────────────────────────────────────────────────────────────────
 jobsphere_backend/target/
 
-# Environment files
+# ── Monorepo root ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Environment files ──────────────────────────────────────────────────────────
 .env
+.env.local
 jobsphere_backend/.env
 jobsphere_frontend/.env
+jobsphere_frontend/.env.local
 
-# OS / IDE
+# ── Docker ────────────────────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── OS / IDE ───────────────────────────────────────────────────────────────────
 .DS_Store
 .idea/
 .vscode/

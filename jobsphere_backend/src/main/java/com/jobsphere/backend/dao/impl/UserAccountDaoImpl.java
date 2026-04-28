@@ -18,6 +18,9 @@ public class UserAccountDaoImpl implements UserAccountDao {
 
     @Override
     public Optional<UserAccount> findByUsernameAndRole(String username, UserRole role) {
+        //String sql = "select * from users where username=?, role=?"
+        //UserAcciount userfound = mongoConnection(MONGO_URI).getExistsUser(username, role, sql)
+        //if(userfound) return UserAccount else throw exception "Not Found"
         return userAccountRepository.findByUsernameIgnoreCaseAndRole(username, role);
     }
 
